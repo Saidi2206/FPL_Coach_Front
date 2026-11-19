@@ -1,0 +1,152 @@
+<section class="hero reveal">
+  @if (meta(); as m) {
+    <p class="kicker">Gameweek <b>{{ m.gw }}</b> &middot; deadline {{ date(m.deadline) }}</p>
+  }
+  <h1>Domine<br /><span>ta gameweek</span></h1>
+
+  @if (meta(); as m) {
+    <app-countdown [deadline]="m.deadline" />
+  }
+
+  <form class="finder" (submit)="go($event)">
+    <input
+      class="input"
+      inputmode="numeric"
+      placeholder="TON ID D'ÉQUIPE FPL"
+      [value]="id()"
+      (input)="id.set($any($event.target).value)"
+    />
+    <button class="btn" [disabled]="!valid()">Analyser</button>
+  </form>
+  <p class="hint muted">
+    Ton ID se trouve dans l'URL de ta page Points :
+    fantasy.premierleague.com/entry/<b>123456</b>/event/…
+  </p>
+</section>
+
+@if (error()) {
+  <div class="card error reveal">{{ error() }}</div>
+}
+
+@if (tips(); as t) {
+  <div class="sections">
+
+    <!-- CAPITAINE -->
+    <section>
+      <h2 class="title">Capitaine <span>top 5</span></h2>
+      <div class="grid cols-3">
+        @for (p of t.captain; track p.name; let i = $index) {
+          <article class="card reveal" [style.animation-delay.ms]="i * 70">
+            <div class="rank">#{{ i + 1 }}</div>
+            <h3>{{ p.name }}</h3>
+            <p class="muted small">{{ p.team }} &middot; {{ price(p.price) }}</p>
+            <p class="vs">{{ p.vs }}</p>
+            <div class="big num">{{ p.xpts }} <small>xPts</small></div>
+            <app-stat-bar [value]="p.xpts ?? 0" [max]="maxOf(t.captain, 'xpts')" />
+            <div class="meta">
+              @if (p.ceiling) { <span class="badge cyan">PLAFOND {{ p.ceiling }}</span> }
+              <span class="badge">{{ p.sel }}% SEL.</span>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+
+    <!-- DIFFERENTIELS -->
+    <section>
+      <h2 class="title">Différentiels <span>&lt; 8 % de sélection</span></h2>
+      <div class="grid cols-3">
+        @for (p of t.differentials; track p.name; let i = $index) {
+          <article class="card reveal" [style.animation-delay.ms]="i * 60">
+            <h3>{{ p.name }}</h3>
+            <p class="muted small">{{ p.team }} &middot; {{ price(p.price) }}</p>
+            <div class="big num">{{ p.pts4 }} <small>xPts / 4 GW</small></div>
+            <app-stat-bar [value]="p.pts4 ?? 0" [max]="maxOf(t.differentials, 'pts4')" />
+            <span class="badge pink">{{ p.sel }}% SEL.</span>
+          </article>
+        }
+      </div>
+    </section>
+
+    <!-- VALEUR -->
+    <section>
+      <h2 class="title">Meilleur rapport qualité / prix</h2>
+      <div class="tabs">
+        @for (p of positions; track p) {
+          <button class="tab" [class.on]="pos() === p" (click)="pos.set(p)">{{ p }}</button>
+        }
+      </div>
+      <div class="card list">
+        @for (p of t.value[pos()]; track p.name; let i = $index) {
+          <div class="row">
+            <span class="idx num">{{ i + 1 }}</span>
+            <div class="who">
+              <b>{{ p.name }}</b>
+              <span class="muted small">{{ p.team }} &middot; {{ price(p.price) }}</span>
+            </div>
+            <span class="num">{{ p.xpts }} xPts</span>
+            <span class="badge">{{ p.valeur }} / £m</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- PRIX -->
+    <section class="grid cols-2">
+      <div>
+        <h2 class="title">Ça monte <span>🔥</span></h2>
+        <div class="card list">
+          @for (p of t.rises; track p.name) {
+            <div class="row">
+              <div class="who"><b>{{ p.name }}</b><span class="muted small">{{ price(p.price) }}</span></div>
+              <span class="num up">+{{ compact(p.net ?? 0) }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div>
+        <h2 class="title">Ça chute <span>❄</span></h2>
+        <div class="card list">
+          @for (p of t.falls; track p.name) {
+            <div class="row">
+              <div class="who"><b>{{ p.name }}</b><span class="muted small">{{ price(p.price) }}</span></div>
+              <span class="num down">{{ compact(p.net ?? 0) }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- EQUIPES -->
+    <section class="grid cols-2">
+      <div>
+        <h2 class="title">Meilleures attaques</h2>
+        <div class="card list">
+          @for (x of t.teams.attack; track x.team) {
+            <div class="row bar">
+              <span class="team">{{ x.team }}</span>
+              <app-stat-bar [value]="x.score" [max]="maxScore(t.teams.attack)" />
+              <span class="num">{{ x.score }}</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div>
+        <h2 class="title">Meilleures défenses</h2>
+        <div class="card list">
+          @for (x of t.teams.defense; track x.team) {
+            <div class="row bar">
+              <span class="team">{{ x.team }}</span>
+              <app-stat-bar [value]="x.score" [max]="maxScore(t.teams.defense)" />
+              <span class="num">{{ x.score }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  </div>
+} @else if (!error()) {
+  <div class="grid cols-3">
+    @for (i of [1,2,3]; track i) { <div class="card skeleton"></div> }
+  </div>
+}

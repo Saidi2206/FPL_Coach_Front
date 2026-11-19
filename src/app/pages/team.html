@@ -1,0 +1,143 @@
+<a routerLink="/" class="back">← Retour</a>
+
+@if (data(); as d) {
+
+  <header class="head reveal">
+    <div>
+      <p class="kicker">Équipe #{{ id() }} &middot; GW {{ d.gw }}</p>
+      <h1>{{ d.team.name }}</h1>
+    </div>
+    <app-countdown [deadline]="d.deadline" />
+  </header>
+
+  <section class="kpis">
+    <div class="card"><span class="lbl">Rang général</span><b class="big num">{{ fmtInt(d.team.rank) }}</b></div>
+    <div class="card"><span class="lbl">Points</span><b class="big num">{{ fmtInt(d.team.points) }}</b></div>
+    <div class="card"><span class="lbl">Banque</span><b class="big num">{{ price(d.team.bank) }}</b></div>
+    <div class="card"><span class="lbl">Transferts gratuits</span><b class="big num up">{{ d.team.free_transfers }}</b></div>
+  </section>
+
+  @if (d.alerts.length) {
+    <section class="alerts">
+      <h2 class="title">Alertes <span>joueurs à surveiller</span></h2>
+      <div class="grid cols-3">
+        @for (a of d.alerts; track a.name) {
+          <article class="card alert reveal">
+            <h3>{{ a.name }}</h3>
+            <span class="badge pink">{{ status(a.status) }}</span>
+            @if (a.chance !== null) { <span class="badge cyan">{{ a.chance }}% de jouer</span> }
+            @if (a.news) { <p class="muted small">{{ a.news }}</p> }
+          </article>
+        }
+      </div>
+    </section>
+  }
+
+  <section>
+    <h2 class="title">Ton XI <span>après les transferts conseillés</span></h2>
+    <div class="lineup">
+      <app-pitch [xi]="d.lineup.xi" [captain]="d.lineup.captain" [vice]="d.lineup.vice" />
+
+      <aside class="card bench">
+        <h3>Banc</h3>
+        @for (p of d.lineup.bench; track p.name + p.team; let i = $index) {
+          <div class="bench-row">
+            <span class="num idx">{{ i === 0 ? 'GK' : i }}</span>
+            <app-player-card [player]="p" mode="row" />
+          </div>
+        }
+        <p class="muted small cap">
+          Capitaine : <b class="up">{{ d.lineup.captain }}</b><br />
+          Vice : <b class="cyan">{{ d.lineup.vice }}</b>
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="title">Transferts <span>horizon {{ d.transfers.horizon }} GW</span></h2>
+
+    @if (d.transfers.advice.length) {
+      <div class="card gain">
+        <span class="lbl">Gain net estimé</span>
+        <b class="big num up">+{{ d.transfers.gain_net }}</b>
+        <span class="muted">pts</span>
+        @if (d.transfers.hit > 0) { <span class="badge pink">-{{ d.transfers.hit }} pts de hit inclus</span> }
+      </div>
+
+      <div class="swaps">
+        @for (a of d.transfers.advice; track $index) {
+          <div class="card swap reveal" [style.animation-delay.ms]="$index * 80">
+            <div class="side out"><span class="tag down">OUT</span><app-player-card [player]="a.out" mode="row" /></div>
+            <span class="arrow">➜</span>
+            <div class="side in"><span class="tag up">IN</span><app-player-card [player]="a.in" mode="row" /></div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="card hold">
+        <h3>Garde ton équipe</h3>
+        <p class="muted">Aucun transfert ne rapporte assez pour justifier l'opération sur {{ d.transfers.horizon }} GW.</p>
+      </div>
+    }
+
+    <h3 class="sub">Gain net selon le nombre de transferts</h3>
+    <div class="card list">
+      @for (o of d.transfers.options; track o.max) {
+        <div class="row opt" [class.best]="o.max === bestMax()">
+          <span class="num">{{ o.max }} max</span>
+          <span class="muted small">{{ o.made }} fait(s) &middot; hit -{{ o.hit }}</span>
+          <app-stat-bar [value]="o.net" [max]="netMax()" />
+          <span class="num" [class.up]="o.net > 0" [class.down]="o.net < 0">{{ o.net > 0 ? '+' : '' }}{{ o.net }}</span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="grid cols-2">
+    <app-tip-list title="Tes maillons faibles" [rows]="weakest()" />
+    <app-tip-list title="Joueurs qui quittent les équipes" [rows]="leaving()" empty="Pas de sortie massive." />
+  </section>
+
+  <section>
+    <h2 class="title">Historique</h2>
+    <div class="card">
+      <div class="chart">
+        @for (g of d.history.gws; track g.gw) {
+          <div class="col" [title]="'GW' + g.gw + ' : ' + g.points + ' pts (moyenne ' + g.average + ')'">
+            <div class="plot">
+              <div class="bar" [class.low]="g.average !== null && g.points < g.average"
+                   [style.height.%]="(g.points / histMax()) * 100"></div>
+              @if (g.average !== null) {
+                <div class="avg" [style.bottom.%]="(g.average / histMax()) * 100"></div>
+              }
+            </div>
+            <span class="gwl">{{ g.gw }}</span>
+          </div>
+        }
+      </div>
+      <p class="muted small legend">
+        <span class="sq up"></span> au-dessus de la moyenne
+        <span class="sq down"></span> en dessous
+        <span class="line"></span> moyenne des managers
+      </p>
+    </div>
+
+    <div class="grid cols-3 regrets">
+      <div class="card"><span class="lbl">Points perdus en hits</span>
+        <b class="big num down">-{{ d.history.hits_lost }}</b></div>
+      <div class="card"><span class="lbl">Points restés sur le banc</span>
+        <b class="big num">{{ d.history.bench_points }}</b></div>
+      <div class="card"><span class="lbl">Regret capitaine</span>
+        <b class="big num down">-{{ d.history.captain_regret }}</b></div>
+    </div>
+  </section>
+
+  <div class="cta">
+    <a class="btn" [routerLink]="['/team', id(), 'chips']">Voir le plan des chips</a>
+  </div>
+} @else if (loading()) {
+  <app-loader message="Analyse de ton équipe… l'optimiseur tourne, compte 10 à 30 secondes." />
+} @else if (error()) {
+  <app-error-box [message]="error()" (retry)="load()" />
+}

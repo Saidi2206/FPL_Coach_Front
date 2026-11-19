@@ -1,0 +1,55 @@
+.hero { padding: 2rem 0 3rem; display: grid; gap: 1.5rem; justify-items: start; }
+.kicker {
+  font-family: var(--font-num); text-transform: uppercase; font-size: .85rem;
+  color: var(--cyan); margin: 0; letter-spacing: .1em;
+}
+.kicker b { color: var(--neon); }
+.hero h1 { transform: skewX(-6deg); }
+.hero h1 span {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--neon);
+  text-shadow: var(--glow);
+}
+
+.finder { display: flex; gap: .8rem; flex-wrap: wrap; width: 100%; max-width: 560px; }
+.finder .input { flex: 1; min-width: 220px; }
+.hint { margin: 0; font-size: .85rem; }
+.hint b { color: var(--neon); }
+
+.error { border-color: var(--magenta); margin-bottom: 2rem; }
+.error::before { background: var(--magenta); box-shadow: 0 0 24px rgba(233,0,82,.5); }
+
+.sections { display: grid; gap: 3.5rem; }
+.title { margin-bottom: 1.2rem; display: flex; align-items: baseline; gap: .8rem; }
+.title span { font-family: var(--font-num); font-size: .8rem; color: var(--muted); text-transform: none; }
+
+.small { font-size: .85rem; margin: .2rem 0; }
+.rank {
+  position: absolute; right: 1rem; top: .6rem;
+  font-family: var(--font-title); font-size: 2.6rem; color: rgba(255,255,255,.07);
+}
+.vs { font-family: var(--font-num); font-size: .8rem; color: var(--cyan); margin: .4rem 0 1rem; }
+.big { font-size: 2.2rem; margin-bottom: .6rem; }
+.big small { font-size: .8rem; color: var(--muted); }
+.meta { display: flex; gap: .4rem; margin-top: .9rem; flex-wrap: wrap; }
+
+.tabs { display: flex; gap: .4rem; margin-bottom: .8rem; }
+.tab {
+  font-family: var(--font-title); letter-spacing: .06em; font-size: 1rem;
+  color: var(--muted); background: transparent;
+  border: 1px solid var(--line); padding: .5rem 1.2rem; cursor: pointer;
+  transition: all .15s;
+}
+.tab:hover { color: var(--text); }
+.tab.on { color: #04110a; background: var(--neon); border-color: var(--neon); box-shadow: var(--glow); }
+
+.list { padding: .4rem 1.25rem; }
+.row {
+  display: flex; align-items: center; gap: 1rem;
+  padding: .75rem 0; border-bottom: 1px solid var(--line);
+}
+.row:last-child { border-bottom: 0; }
+.row .who { flex: 1; display: grid; }
+.idx { color: var(--neon); width: 1.2rem; }
+.row.bar { display: grid; grid-template-columns: 120px 1fr 48px; }
+.team { font-weight: 600; }

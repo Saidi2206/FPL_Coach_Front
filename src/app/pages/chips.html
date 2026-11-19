@@ -1,0 +1,90 @@
+<a [routerLink]="['/team', id()]" class="back">← Retour à mon équipe</a>
+
+@if (data(); as d) {
+
+  <header class="head reveal">
+    <p class="kicker">Équipe #{{ id() }}</p>
+    <h1>Plan des chips</h1>
+  </header>
+
+  <section>
+    <h2 class="title">Plan conseillé</h2>
+    @if (d.plan.length) {
+      <div class="grid cols-3">
+        @for (c of d.plan; track c.chip; let i = $index) {
+          <article class="card chip reveal" [attr.data-chip]="c.chip" [style.animation-delay.ms]="i * 100">
+            <span class="badge cyan">GW {{ c.gw }}</span>
+            <h3>{{ c.chip }}</h3>
+            <p class="gain num">{{ c.gain }}</p>
+            <p class="muted small">Deadline : {{ date(c.deadline) }}</p>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="card"><p class="muted nomargin">Aucune chip à recommander pour cette moitié de saison.</p></div>
+    }
+    <p class="note muted">💡 {{ d.note }}</p>
+
+    @if (d.used.length) {
+      <div class="used">
+        <span class="lbl">Déjà jouées :</span>
+        @for (u of d.used; track u.event) {
+          <span class="badge pink">{{ label(u.name) }} &middot; GW {{ u.event }}</span>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="grid cols-3 details">
+    <div>
+      <h3 class="sub">Wildcard <small>gain sur 4 GW</small></h3>
+      <div class="card list">
+        @for (w of d.wildcard; track w.gw) {
+          <div class="row">
+            <span class="num gw">GW{{ w.gw }}</span>
+            <app-stat-bar [value]="w.gain" [max]="maxWc()" />
+            <span class="num up">+{{ w.gain }}</span>
+          </div>
+        } @empty { <p class="muted">Pas assez de GW restantes.</p> }
+      </div>
+    </div>
+
+    <div>
+      <h3 class="sub">Free Hit <small>gain sur 1 GW</small></h3>
+      <div class="card list">
+        @for (f of d.freehit; track f.gw) {
+          <div class="row">
+            <span class="num gw">GW{{ f.gw }}</span>
+            <app-stat-bar [value]="f.gain" [max]="maxFh()" />
+            <span class="num up">+{{ f.gain }}</span>
+            <span class="badge cyan" title="Nombre de matchs">{{ f.matchs }}M</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div>
+      <h3 class="sub">Bench Boost <small>points du banc</small></h3>
+      <div class="card list">
+        @for (b of d.benchboost; track b.gw) {
+          <div class="row bb">
+            <span class="num gw">GW{{ b.gw }}</span>
+            <div class="bars">
+              <app-stat-bar [value]="b.bench" [max]="maxBb()" />
+              <app-stat-bar class="mine" [value]="b.bench_mine" [max]="maxBb()" />
+            </div>
+            <div class="vals">
+              <span class="num up">{{ b.bench }}</span>
+              <span class="num muted">{{ b.bench_mine }}</span>
+            </div>
+          </div>
+        }
+        <p class="muted small legend">Haut : banc optimisé &middot; bas : ton banc actuel</p>
+      </div>
+    </div>
+  </section>
+} @else if (loading()) {
+  <app-loader message="Calcul des chips (Wildcard, Free Hit, Bench Boost)… ça peut prendre jusqu'à une minute." />
+} @else if (error()) {
+  <app-error-box [message]="error()" (retry)="load()" />
+}

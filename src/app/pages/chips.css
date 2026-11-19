@@ -1,0 +1,37 @@
+.back { display: inline-block; margin-bottom: 1.5rem; font-family: var(--font-num); font-size: .85rem; color: var(--muted); }
+.back:hover { color: var(--neon); }
+
+.head { margin-bottom: 2.5rem; }
+.kicker { font-family: var(--font-num); text-transform: uppercase; font-size: .85rem; color: var(--cyan); margin: 0 0 .5rem; letter-spacing: .1em; }
+.head h1 { transform: skewX(-6deg); }
+
+section { margin-bottom: 3.5rem; }
+.title { margin-bottom: 1.2rem; }
+.small { font-size: .85rem; }
+.nomargin { margin: 0; }
+
+.chip { display: grid; gap: .5rem; justify-items: start; }
+.chip h3 { font-size: 2rem; color: var(--text); }
+.chip .gain { font-size: 1.1rem; color: var(--neon); margin: 0; }
+.chip p { margin: 0; }
+.chip[data-chip='Wildcard']::before { background: var(--magenta); box-shadow: 0 0 24px rgba(233,0,82,.5); }
+.chip[data-chip='Bench Boost']::before { background: var(--cyan); box-shadow: 0 0 24px rgba(4,245,255,.5); }
+.chip[data-chip='Free Hit']::before { background: var(--neon); }
+
+.note { margin: 1.2rem 0 0; font-size: .9rem; }
+.used { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: 1rem; }
+.lbl { font-family: var(--font-num); font-size: .75rem; text-transform: uppercase; color: var(--muted); }
+
+.details { align-items: start; }
+.sub { margin-bottom: .8rem; }
+.sub small { font-family: var(--font-num); font-size: .7rem; color: var(--muted); text-transform: none; margin-left: .4rem; }
+.list { padding: .4rem 1.1rem; }
+.row { display: grid; grid-template-columns: 52px 1fr auto auto; align-items: center; gap: .8rem; padding: .65rem 0; border-bottom: 1px solid var(--line); }
+.row:last-of-type { border-bottom: 0; }
+.gw { color: var(--cyan); font-size: .85rem; }
+
+.bb { grid-template-columns: 52px 1fr auto; }
+.bars { display: grid; gap: 4px; }
+.mine { opacity: .45; }
+.vals { display: grid; text-align: right; font-size: .85rem; }
+.legend { margin: .6rem 0 .3rem; }

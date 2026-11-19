@@ -1,0 +1,26 @@
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(10, 6, 18, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.bar { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+
+.logo {
+  font-family: var(--font-title);
+  font-size: 1.9rem;
+  letter-spacing: 0.04em;
+  transform: skewX(-8deg);
+}
+.logo span { color: var(--neon); text-shadow: var(--glow); }
+
+.tag {
+  font-family: var(--font-num);
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.page { padding-top: 2rem; padding-bottom: 4rem; }
+
+@media (max-width: 600px) { .tag { display: none; } }
